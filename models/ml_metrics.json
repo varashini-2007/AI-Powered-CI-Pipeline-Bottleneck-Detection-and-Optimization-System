@@ -1,0 +1,132 @@
+{
+  "selected_model": "Random Forest",
+  "selection_rationale": "Selected based on highest F1-Score and strong Recall. High Recall prevents costly false negatives where genuine pipeline bottlenecks stall development without being detected.",
+  "metrics": {
+    "accuracy": 0.8939,
+    "precision": 0.8152,
+    "recall": 0.8152,
+    "f1_score": 0.8152
+  },
+  "confusion_matrix": {
+    "true_negatives": 423,
+    "false_positives": 34,
+    "false_negatives": 34,
+    "true_positives": 150,
+    "raw_matrix": [
+      [
+        423,
+        34
+      ],
+      [
+        34,
+        150
+      ]
+    ]
+  },
+  "error_analysis": {
+    "false_positives_count": 34,
+    "false_negatives_count": 34,
+    "fp_description": "Model flagged normal build as a bottleneck (mild developer false alarm).",
+    "fn_description": "Model failed to detect an actual bottleneck (costlier miss where developers suffer delays undetected).",
+    "fp_examples": [
+      {
+        "build_id": "BUILD-1187",
+        "task_name": "dependency_install_step_2",
+        "queue_time_seconds": 531.09,
+        "task_duration_seconds": 43.06,
+        "cache_hit_rate": 0.9792
+      },
+      {
+        "build_id": "BUILD-1291",
+        "task_name": "integration_test_step_1",
+        "queue_time_seconds": 427.4,
+        "task_duration_seconds": 99.9,
+        "cache_hit_rate": 1.0
+      },
+      {
+        "build_id": "BUILD-1962",
+        "task_name": "compile_step_2",
+        "queue_time_seconds": 11.06,
+        "task_duration_seconds": 168.88,
+        "cache_hit_rate": 0.1008
+      }
+    ],
+    "fn_examples": [
+      {
+        "build_id": "BUILD-1741",
+        "task_name": "dependency_install_step_2",
+        "queue_time_seconds": 61.02,
+        "task_duration_seconds": 88.32,
+        "cache_hit_rate": 0.1613
+      },
+      {
+        "build_id": "BUILD-1284",
+        "task_name": "build_step_4",
+        "queue_time_seconds": 81.95,
+        "task_duration_seconds": 105.8,
+        "cache_hit_rate": 0.9221
+      },
+      {
+        "build_id": "BUILD-1080",
+        "task_name": "dependency_install_step_2",
+        "queue_time_seconds": 41.48,
+        "task_duration_seconds": 165.35,
+        "cache_hit_rate": 0.1667
+      }
+    ]
+  },
+  "model_comparison": {
+    "Logistic Regression": {
+      "accuracy": 0.858,
+      "precision": 0.7962,
+      "recall": 0.6793,
+      "f1_score": 0.7331,
+      "confusion_matrix": [
+        [
+          425,
+          32
+        ],
+        [
+          59,
+          125
+        ]
+      ]
+    },
+    "Random Forest": {
+      "accuracy": 0.8939,
+      "precision": 0.8152,
+      "recall": 0.8152,
+      "f1_score": 0.8152,
+      "confusion_matrix": [
+        [
+          423,
+          34
+        ],
+        [
+          34,
+          150
+        ]
+      ]
+    }
+  },
+  "feature_importances": {
+    "queue_time_seconds": 0.3623,
+    "task_duration_seconds": 0.1859,
+    "build_duration_seconds": 0.1753,
+    "cache_hit_rate": 0.1168,
+    "agent_utilisation_percent": 0.101,
+    "number_of_tasks": 0.034,
+    "parallelizable_tasks": 0.0189,
+    "failed_tasks": 0.0058
+  },
+  "feature_names": [
+    "queue_time_seconds",
+    "task_duration_seconds",
+    "cache_hit_rate",
+    "agent_utilisation_percent",
+    "number_of_tasks",
+    "failed_tasks",
+    "parallelizable_tasks",
+    "build_duration_seconds"
+  ]
+}
