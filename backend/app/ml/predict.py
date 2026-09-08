@@ -18,6 +18,13 @@ class MLPredictor:
         self._load_model()
 
     def _load_model(self):
+        if not MODEL_FILE_PATH.exists():
+            try:
+                from backend.app.ml.train import train_and_evaluate
+                train_and_evaluate()
+            except Exception as exc:
+                print(f"[MLPredictor] Warning: Auto-training failed: {exc}")
+
         if MODEL_FILE_PATH.exists():
             self.bundle = joblib.load(MODEL_FILE_PATH)
             self.model = self.bundle["model"]

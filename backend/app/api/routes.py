@@ -245,6 +245,12 @@ def predict_ml(request: MLPredictRequest):
 @router.get("/ml/metrics")
 def get_ml_metrics():
     if not METRICS_FILE_PATH.exists():
+        try:
+            from backend.app.ml.train import train_and_evaluate
+            train_and_evaluate()
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=f"Failed to compute ML metrics: {str(exc)}")
+    if not METRICS_FILE_PATH.exists():
         raise HTTPException(status_code=404, detail="ML metrics not yet computed. Run ML training pipeline.")
     with open(METRICS_FILE_PATH, "r", encoding="utf-8") as f:
         metrics = json.load(f)

@@ -2,7 +2,7 @@
 Pydantic Data Validation and Response Schemas.
 """
 from typing import List, Dict, Any, Optional
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 
 class BuildBase(BaseModel):
     build_id: str
@@ -68,6 +68,28 @@ class MLPredictRequest(BaseModel):
     failed_tasks: int = Field(0, ge=0, description="Number of failed tasks")
     parallelizable_tasks: int = Field(0, ge=0, description="Number of parallelizable tasks")
     build_duration_seconds: float = Field(..., ge=0, description="Total build duration in seconds")
+
+    @field_validator("cache_hit_rate", mode="before")
+    @classmethod
+    def normalize_cache_hit_rate(cls, v):
+        try:
+            val = float(v)
+            if 1.0 < val <= 100.0:
+                return val / 100.0
+            return val
+        except (ValueError, TypeError):
+            return v
+
+    @field_validator("agent_utilisation_percent", mode="before")
+    @classmethod
+    def normalize_agent_utilisation(cls, v):
+        try:
+            val = float(v)
+            if 1.0 < val <= 100.0:
+                return val / 100.0
+            return val
+        except (ValueError, TypeError):
+            return v
 
 class MLPredictResponse(BaseModel):
     prediction: int
