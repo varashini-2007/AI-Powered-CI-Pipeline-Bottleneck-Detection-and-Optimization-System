@@ -31,7 +31,7 @@ ChartJS.register(
 export default function ChartsSection({ builds }) {
   if (!builds || builds.length === 0) {
     return (
-      <div className="glass-card" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+      <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
         Loading CI build telemetry charts...
       </div>
     );
@@ -46,26 +46,28 @@ export default function ChartsSection({ builds }) {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: false
-      },
+      legend: { display: false },
       tooltip: {
-        backgroundColor: '#111827',
-        titleColor: '#f8fafc',
+        backgroundColor: 'rgba(14, 22, 38, 0.96)',
+        titleColor: '#ffffff',
+        titleFont: { family: 'Outfit', size: 13, weight: 'bold' },
         bodyColor: '#cbd5e1',
-        borderColor: 'rgba(255,255,255,0.1)',
+        bodyFont: { family: 'Inter', size: 12 },
+        borderColor: 'rgba(255, 255, 255, 0.15)',
         borderWidth: 1,
-        padding: 10
+        padding: 12,
+        cornerRadius: 10,
+        boxPadding: 4
       }
     },
     scales: {
       x: {
-        grid: { color: 'rgba(255,255,255,0.04)' },
-        ticks: { color: '#64748b', font: { size: 10 } }
+        grid: { color: 'rgba(255,255,255,0.03)' },
+        ticks: { color: '#94a3b8', font: { size: 10, family: 'JetBrains Mono' } }
       },
       y: {
-        grid: { color: 'rgba(255,255,255,0.05)' },
-        ticks: { color: '#64748b', font: { size: 10 } }
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: '#94a3b8', font: { size: 10, family: 'Inter' } }
       }
     }
   };
@@ -79,10 +81,14 @@ export default function ChartsSection({ builds }) {
         label: 'Build Duration (s)',
         data: sampleBuilds.map((b) => b.build_duration_seconds),
         borderColor: '#6366f1',
-        backgroundColor: 'rgba(99, 102, 241, 0.12)',
-        tension: 0.35,
-        pointRadius: 3,
-        pointHoverRadius: 6
+        backgroundColor: 'rgba(99, 102, 241, 0.14)',
+        tension: 0.38,
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: '#6366f1',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 1.5,
+        pointHoverRadius: 7
       }
     ]
   };
@@ -96,10 +102,14 @@ export default function ChartsSection({ builds }) {
         label: 'Queue Time (s)',
         data: sampleBuilds.map((b) => b.queue_time_seconds),
         borderColor: '#06b6d4',
-        backgroundColor: 'rgba(6, 182, 212, 0.12)',
-        tension: 0.35,
-        pointRadius: 3,
-        pointHoverRadius: 6
+        backgroundColor: 'rgba(6, 182, 212, 0.14)',
+        tension: 0.38,
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: '#06b6d4',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 1.5,
+        pointHoverRadius: 7
       }
     ]
   };
@@ -112,9 +122,11 @@ export default function ChartsSection({ builds }) {
         label: 'Cache Hit Rate (%)',
         data: sampleBuilds.map((b) => Math.round(b.cache_hit_rate * 100)),
         backgroundColor: sampleBuilds.map((b) =>
-          b.cache_hit_rate < 0.5 ? 'rgba(239, 68, 68, 0.75)' : 'rgba(16, 185, 129, 0.75)'
+          b.cache_hit_rate < 0.5 ? 'rgba(239, 68, 68, 0.85)' : 'rgba(16, 185, 129, 0.85)'
         ),
-        borderRadius: 4
+        borderRadius: 6,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.12)'
       }
     ]
   };
@@ -127,9 +139,11 @@ export default function ChartsSection({ builds }) {
         label: 'Agent Utilisation (%)',
         data: sampleBuilds.map((b) => Math.round(b.agent_utilisation_percent * 100)),
         backgroundColor: sampleBuilds.map((b) =>
-          b.agent_utilisation_percent > 0.90 ? 'rgba(239, 68, 68, 0.75)' : 'rgba(168, 85, 247, 0.75)'
+          b.agent_utilisation_percent > 0.90 ? 'rgba(239, 68, 68, 0.85)' : 'rgba(168, 85, 247, 0.85)'
         ),
-        borderRadius: 4
+        borderRadius: 6,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.12)'
       }
     ]
   };
@@ -140,8 +154,8 @@ export default function ChartsSection({ builds }) {
       <div className="glass-card chart-card">
         <div className="chart-header">
           <div className="chart-title">
-            <TrendingUp size={18} color="#6366f1" />
-            Build Duration Trend
+            <TrendingUp size={20} color="#6366f1" />
+            <span>Build Duration Trend</span>
           </div>
           <span className="badge badge-pill">Seconds</span>
         </div>
@@ -154,8 +168,8 @@ export default function ChartsSection({ builds }) {
       <div className="glass-card chart-card">
         <div className="chart-header">
           <div className="chart-title">
-            <Clock size={18} color="#06b6d4" />
-            Queue Wait Time (Threshold: 300s)
+            <Clock size={20} color="#06b6d4" />
+            <span>Queue Wait Time (Threshold: 300s)</span>
           </div>
           <span className="badge badge-pill">Runner Latency</span>
         </div>
@@ -168,10 +182,10 @@ export default function ChartsSection({ builds }) {
       <div className="glass-card chart-card">
         <div className="chart-header">
           <div className="chart-title">
-            <Archive size={18} color="#10b981" />
-            Cache Hit Efficiency (Target &gt; 50%)
+            <Archive size={20} color="#10b981" />
+            <span>Cache Hit Efficiency (Target &gt; 50%)</span>
           </div>
-          <span className="badge badge-pill">Red = Low Cache</span>
+          <span className="badge badge-low">Red = Misses</span>
         </div>
         <div className="chart-canvas-container">
           <Bar data={cacheData} options={chartOptions} />
@@ -182,10 +196,10 @@ export default function ChartsSection({ builds }) {
       <div className="glass-card chart-card">
         <div className="chart-header">
           <div className="chart-title">
-            <Cpu size={18} color="#a855f7" />
-            Agent Utilisation (Saturation &gt; 90%)
+            <Cpu size={20} color="#a855f7" />
+            <span>Agent Utilisation (Threshold &gt; 90%)</span>
           </div>
-          <span className="badge badge-pill">Red = Overloaded</span>
+          <span className="badge badge-critical">Red = Saturated</span>
         </div>
         <div className="chart-canvas-container">
           <Bar data={agentData} options={chartOptions} />

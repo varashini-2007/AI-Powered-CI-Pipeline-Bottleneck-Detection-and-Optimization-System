@@ -13,42 +13,32 @@ export default function Header({ activeTab, setActiveTab, healthStatus }) {
   return (
     <header className="app-header">
       <div className="header-brand">
-        <div className="header-logo">
+        <div className="header-logo" title="CI Intelligent Optimization Engine">
           <Cpu size={26} color="#ffffff" />
         </div>
         <div className="header-title-wrap">
           <h1>CI BOTTLENECK ANALYSER</h1>
-          <div className="flex-row" style={{ marginTop: '2px' }}>
-            <span className="header-subtitle">Pipeline Diagnostics & ML Optimization Engine</span>
-            <span style={{ color: 'var(--border-subtle)' }}>•</span>
-            <span style={{ 
-              display: 'inline-flex', 
-              alignItems: 'center', 
-              gap: '6px', 
-              fontSize: '0.75rem', 
-              color: healthStatus === 'healthy' ? 'var(--success)' : 'var(--warning)',
-              fontFamily: 'var(--font-mono)' 
-            }}>
-              <span style={{ 
-                width: 8, 
-                height: 8, 
-                borderRadius: '50%', 
-                background: healthStatus === 'healthy' ? 'var(--success)' : 'var(--warning)' 
-              }}></span>
-              API {healthStatus || 'Connecting...'}
-            </span>
+          <div className="header-meta">
+            <span className="header-subtitle">Intelligent Telemetry &amp; ML Optimization</span>
+            <span style={{ color: 'rgba(255, 255, 255, 0.2)' }}>•</span>
+            <div className="live-status-pill">
+              <span className="status-beacon" />
+              <span>{healthStatus === 'healthy' ? 'API ONLINE • 1,500 BUILDS' : 'CONNECTING...'}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <nav className="header-nav">
+      <nav className="header-nav" aria-label="Dashboard Navigation">
         {tabs.map((tab) => {
           const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
-              className={`nav-tab ${activeTab === tab.id ? 'active' : ''}`}
+              className={`nav-tab ${isActive ? 'active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
+              aria-current={isActive ? 'page' : undefined}
             >
               <Icon size={16} />
               {tab.label}

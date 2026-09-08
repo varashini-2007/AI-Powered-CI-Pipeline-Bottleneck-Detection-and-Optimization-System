@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, AlertTriangle, CheckCircle, HelpCircle, ArrowRight, Activity } from 'lucide-react';
+import { X, AlertTriangle, CheckCircle, HelpCircle, ArrowRight, Activity, ShieldAlert, Cpu } from 'lucide-react';
 
 export default function RecommendationDetailModal({ recommendation, onClose }) {
   if (!recommendation) return null;
@@ -24,98 +24,95 @@ export default function RecommendationDetailModal({ recommendation, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
+        {/* Modal Header */}
         <div className="modal-header">
           <div>
-            <div className="flex-row" style={{ marginBottom: '0.5rem' }}>
+            <div className="flex-row" style={{ marginBottom: '0.6rem' }}>
               <span className={`badge ${getSeverityBadgeClass(recommendation.severity)}`}>
                 {recommendation.severity} SEVERITY
               </span>
-              <span className="badge badge-pill">
+              <span className="badge badge-none" style={{ fontFamily: 'var(--font-mono)' }}>
                 BUILD: {recommendation.build_id}
               </span>
             </div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 800, color: '#ffffff', lineHeight: 1.2 }}>
               {recommendation.problem?.replace(/_/g, ' ')}
             </h2>
           </div>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Close">
-            <X size={22} />
+          <button className="modal-close-btn" onClick={onClose} aria-label="Close dialog">
+            <X size={20} />
           </button>
         </div>
 
-        {/* 4-Question Breakdown */}
-        <div className="detail-section">
-          <div className="detail-section-title flex-row">
-            <HelpCircle size={14} />
-            1. What Happened?
+        {/* 4-Question Explainable Framework Cards */}
+        <div className="explain-card" style={{ borderLeft: '4px solid #38bdf8' }}>
+          <div className="explain-card-title" style={{ color: '#38bdf8' }}>
+            <HelpCircle size={17} />
+            <span>1. What Happened?</span>
           </div>
-          <p className="detail-text">{explanation.what_happened}</p>
+          <p className="explain-card-body">{explanation.what_happened}</p>
         </div>
 
-        <div className="detail-section">
-          <div className="detail-section-title flex-row" style={{ color: 'var(--warning)' }}>
-            <AlertTriangle size={14} />
-            2. Why Does It Matter?
+        <div className="explain-card" style={{ borderLeft: '4px solid #f59e0b' }}>
+          <div className="explain-card-title" style={{ color: '#fbbf24' }}>
+            <AlertTriangle size={17} />
+            <span>2. Why Does It Matter?</span>
           </div>
-          <p className="detail-text">{explanation.why_it_matters}</p>
+          <p className="explain-card-body">{explanation.why_it_matters}</p>
         </div>
 
-        <div className="detail-section">
-          <div className="detail-section-title flex-row" style={{ color: 'var(--success)' }}>
-            <CheckCircle size={14} />
-            3. What Should Be Done? (Recommendation)
+        <div className="explain-card" style={{ borderLeft: '4px solid #10b981', background: 'rgba(16, 185, 129, 0.08)' }}>
+          <div className="explain-card-title" style={{ color: '#34d399' }}>
+            <CheckCircle size={17} />
+            <span>3. Prescribed Optimization Strategy</span>
           </div>
-          <div style={{
-            background: 'rgba(99, 102, 241, 0.08)',
-            borderLeft: '4px solid var(--primary)',
-            padding: '1rem',
-            borderRadius: '0 8px 8px 0',
-            fontSize: '0.95rem',
-            lineHeight: 1.6
-          }}>
+          <div style={{ fontSize: '0.96rem', color: '#ffffff', lineHeight: 1.6, fontWeight: 500 }}>
             {recommendation.recommendation}
           </div>
         </div>
 
-        <div className="detail-section">
-          <div className="detail-section-title flex-row" style={{ color: 'var(--accent-cyan)' }}>
-            <Activity size={14} />
-            4. Supporting Evidence & Telemetry
+        <div className="explain-card" style={{ borderLeft: '4px solid #a855f7' }}>
+          <div className="explain-card-title" style={{ color: '#c084fc' }}>
+            <Activity size={17} />
+            <span>4. Supporting Evidence &amp; Telemetry Data</span>
           </div>
-          <p className="detail-text" style={{ marginBottom: '0.5rem' }}>
+          <p className="explain-card-body" style={{ marginBottom: '0.65rem' }}>
             {explanation.evidence_supports}
           </p>
           <div className="evidence-box">
-            <pre>{JSON.stringify(recommendation.evidence, null, 2)}</pre>
+            <pre style={{ margin: 0 }}>{JSON.stringify(recommendation.evidence, null, 2)}</pre>
           </div>
         </div>
 
-        {/* Threshold & Impact Details */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '1rem',
-          background: 'rgba(0,0,0,0.25)',
-          padding: '1rem',
-          borderRadius: 'var(--radius-sm)',
-          border: '1px solid var(--border-subtle)'
-        }}>
+        {/* Observed vs Threshold Telemetry Bar */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
+            gap: '1.25rem',
+            background: 'var(--bg-sunken)',
+            padding: '1.25rem',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            boxShadow: 'var(--neu-sunken)',
+            marginTop: '1.5rem'
+          }}
+        >
           <div>
             <div className="metric-sub">OBSERVED VALUE</div>
-            <div style={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#ffffff', fontSize: '1.05rem', marginTop: '3px' }}>
               {recommendation.observed_value}
             </div>
           </div>
           <div>
-            <div className="metric-sub">CONFIGURED THRESHOLD</div>
-            <div style={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>
+            <div className="metric-sub">BENCHMARK THRESHOLD</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#94a3b8', fontSize: '1.05rem', marginTop: '3px' }}>
               {recommendation.threshold}
             </div>
           </div>
           <div>
-            <div className="metric-sub">ESTIMATED IMPACT</div>
-            <div style={{ fontWeight: 600, color: 'var(--accent-cyan)', fontSize: '0.88rem' }}>
+            <div className="metric-sub">ESTIMATED EFFICIENCY IMPACT</div>
+            <div style={{ fontWeight: 600, color: 'var(--accent-cyan)', fontSize: '0.9rem', marginTop: '3px' }}>
               {recommendation.estimated_impact || 'Reduces critical pipeline latency.'}
             </div>
           </div>

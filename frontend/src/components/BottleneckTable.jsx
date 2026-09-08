@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Filter, ExternalLink, AlertCircle } from 'lucide-react';
+import { Filter, ExternalLink, AlertCircle, Sparkles } from 'lucide-react';
 
 export default function BottleneckTable({ bottlenecks, onSelectBottleneck }) {
   const [severityFilter, setSeverityFilter] = useState('ALL');
   const [problemFilter, setProblemFilter] = useState('ALL');
+
+  const severities = ['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
 
   const filteredBottlenecks = bottlenecks.filter((b) => {
     const matchesSev = severityFilter === 'ALL' || b.severity?.toUpperCase() === severityFilter;
@@ -26,63 +28,66 @@ export default function BottleneckTable({ bottlenecks, onSelectBottleneck }) {
       <div className="table-header-row">
         <div>
           <h2 className="table-title">
-            <AlertCircle size={20} color="#f59e0b" />
+            <AlertCircle size={22} color="#f59e0b" />
             Detected CI Bottlenecks
           </h2>
-          <p className="metric-sub" style={{ marginTop: '3px' }}>
+          <p className="metric-sub" style={{ marginTop: '4px' }}>
             Showing {filteredBottlenecks.length} of {bottlenecks.length} detected pipeline anomalies. Click any row for in-depth explainability.
           </p>
         </div>
 
-        <div className="table-filters">
-          <select
-            className="filter-select"
-            value={severityFilter}
-            onChange={(e) => setSeverityFilter(e.target.value)}
-          >
-            <option value="ALL">All Severities</option>
-            <option value="CRITICAL">Critical</option>
-            <option value="HIGH">High</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="LOW">Low</option>
-          </select>
+        <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Neumorphic Severity Pill Filters */}
+          <div className="table-filters" role="radiogroup" aria-label="Filter by Severity">
+            {severities.map((sev) => (
+              <button
+                key={sev}
+                type="button"
+                className={`filter-pill ${severityFilter === sev ? 'active' : ''}`}
+                onClick={() => setSeverityFilter(sev)}
+              >
+                {sev}
+              </button>
+            ))}
+          </div>
 
           <select
-            className="filter-select"
+            className="neu-input"
+            style={{ padding: '0.42rem 0.85rem', fontSize: '0.82rem', minWidth: '180px' }}
             value={problemFilter}
             onChange={(e) => setProblemFilter(e.target.value)}
           >
-            <option value="ALL">All Bottleneck Types</option>
+            <option value="ALL">All Categories</option>
             <option value="QUEUE_BOTTLENECK">Queue Bottleneck</option>
             <option value="LOW_CACHE_EFFICIENCY">Low Cache Efficiency</option>
             <option value="SLOW_TASK">Slow Task</option>
             <option value="AGENT_UTILISATION">Agent Utilisation</option>
-            <option value="PARALLELISATION_OPPORTUNITY">Parallelisation</option>
+            <option value="PARALLELISATION_OPPORTUNITY">Parallelisation Opportunity</option>
           </select>
         </div>
       </div>
 
-      <div style={{ overflowX: 'auto' }}>
+      <div className="table-container">
         <table className="custom-table">
           <thead>
             <tr>
               <th>Build ID</th>
-              <th>Problem</th>
+              <th>Problem Category</th>
               <th>Severity</th>
-              <th>Observed Value</th>
-              <th>Recommendation</th>
-              <th>Action</th>
+              <th>Observed Telemetry</th>
+              <th>Prescribed Optimization</th>
+              <th style={{ textAlign: 'right' }}>Diagnosis</th>
             </tr>
           </thead>
           <tbody>
             {filteredBottlenecks.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                <td colSpan={6} style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
                   No bottlenecks found matching selected filters.
                 </td>
               </tr>
             ) : (
-              filteredBottlenecks.slice(0, 35).map((b, idx) => (
+              filteredBottlenecks.slice(0, 40).map((b, idx) => (
                 <tr key={b.id || idx} onClick={() => onSelectBottleneck(b)}>
                   <td>{b.build_id}</td>
                   <td style={{ fontWeight: 600 }}>
@@ -93,22 +98,23 @@ export default function BottleneckTable({ bottlenecks, onSelectBottleneck }) {
                       {b.severity}
                     </span>
                   </td>
-                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: '#cbd5e1' }}>
+                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: '#cbd5e1' }}>
                     {b.observed_value}
                   </td>
                   <td style={{ maxWidth: '380px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {b.recommendation}
                   </td>
-                  <td>
+                  <td style={{ textAlign: 'right' }}>
                     <button
-                      className="badge badge-pill"
-                      style={{ cursor: 'pointer', border: 'none', padding: '0.35rem 0.75rem' }}
+                      type="button"
+                      className="btn-inspect"
                       onClick={(e) => {
                         e.stopPropagation();
                         onSelectBottleneck(b);
                       }}
                     >
-                      Inspect <ExternalLink size={12} style={{ marginLeft: 4 }} />
+                      <span>Explain</span>
+                      <ExternalLink size={12} />
                     </button>
                   </td>
                 </tr>
