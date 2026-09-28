@@ -1,0 +1,263 @@
+Build the initial foundation for a full-stack project called **CI Insight: Intelligent CI Bottleneck Analyser for Regulated Enterprises**.
+
+## Project Goal
+
+The system will analyse CI/CD pipeline performance and identify bottlenecks that increase developer feedback time. The final system must provide evidence-based recommendations for build caching and task parallelisation, while explaining recommendations in language understandable by non-specialist reviewers and compliance stakeholders.
+
+For this step, ONLY implement the project foundation and dataset generation. Do not build advanced machine learning models yet.
+
+## Technology Stack
+
+Use:
+
+* Backend: Python with FastAPI
+* Data processing: Pandas and NumPy
+* Frontend: React with a clean dashboard structure
+* Database: SQLite for initial development
+* Visualisation: Chart.js or Recharts
+* Authentication: Create placeholder role-based authentication structure
+* Testing: Pytest
+
+## Create This Folder Structure
+
+```text
+ci-bottleneck-analyser/
+│
+├── backend/
+│   ├── main.py
+│   ├── models.py
+│   ├── analyzer.py
+│   ├── recommendations.py
+│   ├── requirements.txt
+│   └── database.py
+│
+├── frontend/
+│   └── dashboard/
+│
+├── data/
+│   ├── builds.csv
+│   ├── task_timings.csv
+│   ├── cache_events.csv
+│   ├── agent_utilisation.csv
+│   └── ground_truth.csv
+│
+├── experiments/
+│
+├── tests/
+│
+├── docs/
+│   ├── requirements.md
+│   └── limitations.md
+│
+└── README.md
+```
+
+## Generate a Realistic Synthetic CI/CD Dataset
+
+Generate at least **1,000 build records** distributed across at least **3 organisations**:
+
+* Org_A
+* Org_B
+* Org_C
+
+Each build should belong to an organisation and project.
+
+### builds.csv
+
+Include:
+
+* build_id
+* organisation_id
+* project_id
+* build_status
+* start_time
+* end_time
+* total_duration_seconds
+* queue_time_seconds
+* agent_id
+
+Generate realistic variation in build durations and queue times.
+
+### task_timings.csv
+
+Each build should contain multiple CI tasks chosen from:
+
+* dependency_install
+* compile
+* unit_tests
+* integration_tests
+* security_scan
+* package_build
+* deployment_validation
+
+Include:
+
+* build_id
+* task_name
+* duration_seconds
+* dependency_group
+* parallelisable
+
+Create realistic cases where some tasks are slow and some parallelisable tasks are executed sequentially.
+
+### cache_events.csv
+
+Include:
+
+* build_id
+* task_name
+* cache_status
+* cache_key
+
+Use cache statuses:
+
+* HIT
+* MISS
+
+Create realistic scenarios with high cache miss rates for some organisations or projects.
+
+### agent_utilisation.csv
+
+Include:
+
+* build_id
+* agent_id
+* cpu_utilisation
+* memory_utilisation
+* busy_percentage
+* available_agents
+
+Create some overloaded agent scenarios where utilisation exceeds 85%.
+
+### ground_truth.csv
+
+For every build, include:
+
+* build_id
+* actual_bottleneck
+* severity
+
+Use these bottleneck labels:
+
+* CACHE_PROBLEM
+* PARALLELISATION_PROBLEM
+* QUEUE_CONGESTION
+* SLOW_TASK
+* RESOURCE_BOTTLENECK
+* NORMAL
+
+Severity values:
+
+* LOW
+* MEDIUM
+* HIGH
+* CRITICAL
+
+Ensure the dataset intentionally contains realistic edge cases and some ambiguous cases so that later we can analyse false positives and false negatives.
+
+## Add a Dataset Generator
+
+Create:
+
+```text
+backend/generate_dataset.py
+```
+
+The script should generate all CSV files automatically.
+
+Use a fixed random seed so results are reproducible.
+
+Include comments explaining how each type of bottleneck is simulated.
+
+## Initial Requirements Document
+
+Create `docs/requirements.md` containing:
+
+### Functional Requirements
+
+1. Analyse CI build logs and performance data.
+2. Detect CI bottlenecks.
+3. Recommend build-cache improvements.
+4. Recommend parallelisation opportunities.
+5. Show evidence for every high-priority recommendation.
+6. Explain recommendations in simple, non-technical language.
+7. Support multiple organisations.
+8. Support different user roles:
+
+   * Developer
+   * Engineering Manager
+   * Compliance Reviewer
+   * External Partner
+   * Admin
+9. Provide baseline and post-optimisation metrics.
+10. Track median developer feedback time.
+
+### Non-Functional Requirements
+
+1. Recommendations must be explainable.
+2. High-priority outputs must include evidence.
+3. Organisation data must be isolated.
+4. Role-based access must control visible information.
+5. Dataset generation must be reproducible.
+6. The system must support error analysis including false positives and false negatives.
+
+## Initial Limitations Document
+
+Create `docs/limitations.md` explaining that:
+
+* Synthetic data is initially used instead of confidential production CI data.
+* Rule thresholds may need tuning with real enterprise data.
+* Recommendations are advisory and do not automatically modify production pipelines.
+* Agent utilisation may be estimated depending on CI platform integration.
+* The MVP focuses primarily on caching and parallelisation.
+
+## README
+
+Create a professional README containing:
+
+* Project title
+* Problem statement summary
+* Objective
+* Technology stack
+* Folder structure
+* Dataset description
+* How to run the backend
+* How to generate the dataset
+* Future development phases
+
+## Basic FastAPI Setup
+
+Create a working FastAPI application in `backend/main.py`.
+
+Include these initial endpoints:
+
+```text
+GET /health
+GET /organisations
+GET /builds
+GET /builds/{build_id}
+```
+
+For now, load data from the generated CSV files.
+
+The `/health` endpoint should return:
+
+```json
+{
+  "status": "healthy",
+  "service": "CI Bottleneck Analyser"
+}
+```
+
+## Important Requirements
+
+* Generate working code, not placeholders.
+* Ensure all imports and dependencies are correct.
+* Create a requirements.txt file.
+* Add error handling for missing build IDs.
+* Keep the code modular for future steps.
+* Do not implement the recommendation engine yet.
+* Do not implement machine learning yet.
+* Do not build unnecessary complex authentication yet; only create the foundation for roles.
+* Make sure the backend can run successfully after installation.
+* At the end, provide clear instructions to run the project and verify all API endpoints.

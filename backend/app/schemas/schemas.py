@@ -114,3 +114,62 @@ class AnalyseBuildResponse(BaseModel):
     bottlenecks_detected: int
     bottlenecks: List[BottleneckResponse]
     recommendations: List[RecommendationResponse]
+
+class OrganisationSummaryResponse(BaseModel):
+    organisation_id: str
+    organisation_name: str
+    total_builds: int
+    projects: List[str]
+    avg_duration_seconds: float
+    avg_queue_time_seconds: float
+    avg_cache_hit_rate: float
+    dominant_bottleneck: str
+
+class CIWebhookTaskInput(BaseModel):
+    name: str
+    duration_seconds: float
+    cache_hit: Optional[bool] = False
+    parallelisable: Optional[bool] = False
+
+class CIWebhookRequest(BaseModel):
+    event_type: str = "workflow_job_completed"
+    provider: str = "github_actions"
+    repository: str = "retail-banking/payments-api"
+    organization_id: str = "Org_A"
+    build_id: str = "BUILD-GH-9921"
+    branch: Optional[str] = "main"
+    author: Optional[str] = "dev-lead@enterprise.internal"
+    queue_time_seconds: float = 385.0
+    build_duration_seconds: float = 840.0
+    agent_utilisation_percent: float = 0.93
+    tasks: Optional[List[CIWebhookTaskInput]] = []
+    raw_logs: Optional[str] = ""
+
+class CIWebhookResponse(BaseModel):
+    status: str
+    message: str
+    organization_id: str
+    build_id: str
+    evidence_sha256_hash: str
+    compliance_status: str
+    telemetry_summary: Dict[str, Any]
+    detected_bottlenecks: List[BottleneckResponse]
+    recommendations: List[RecommendationResponse]
+    compliance_audit_record: Dict[str, Any]
+
+class StakeholderReview(BaseModel):
+    persona_id: str
+    role_name: str
+    reviewer_name: str
+    organization: str
+    rating: float
+    feedback_quote: str
+    rubric_scores: Dict[str, float]
+    verification_status: str
+
+class StakeholderValidationResponse(BaseModel):
+    overall_satisfaction_score: float
+    total_reviews: int
+    validation_status: str
+    reviews: List[StakeholderReview]
+

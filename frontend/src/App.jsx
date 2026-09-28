@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
+import RoleBanner from './components/RoleBanner';
 import SummaryCards from './components/SummaryCards';
 import ChartsSection from './components/ChartsSection';
 import BottleneckTable from './components/BottleneckTable';
@@ -7,19 +8,25 @@ import RecommendationDetailModal from './components/RecommendationDetailModal';
 import MLPredictorView from './components/MLPredictorView';
 import MLValidationView from './components/MLValidationView';
 import EdgeCasesShowcase from './components/EdgeCasesShowcase';
+import FeedbackTimeExperimentView from './components/FeedbackTimeExperimentView';
+import CIIntegrationStubView from './components/CIIntegrationStubView';
+import StakeholderValidationView from './components/StakeholderValidationView';
 import {
   fetchHealth,
   fetchDashboardSummary,
   fetchBuilds,
   fetchBottlenecks,
-  fetchRecommendations,
-  fetchRecommendationById
+  fetchRecommendations
 } from './services/api';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('overview');
   const [healthStatus, setHealthStatus] = useState('checking');
   
+  // Enterprise RBAC & Multi-tenant states
+  const [userRole, setUserRole] = useState('developer');
+  const [selectedOrg, setSelectedOrg] = useState('all');
+
   // Real backend data states
   const [summary, setSummary] = useState(null);
   const [builds, setBuilds] = useState([]);
@@ -45,15 +52,15 @@ export default function App() {
         setSummary(summaryData);
 
         // Fetch real builds for charts & statistics
-        const buildsData = await fetchBuilds(100, 0);
+        const buildsData = await fetchBuilds(150, 0);
         setBuilds(buildsData);
 
         // Fetch real detected bottlenecks
-        const bottlenecksData = await fetchBottlenecks(100, 0);
+        const bottlenecksData = await fetchBottlenecks(150, 0);
         setBottlenecks(bottlenecksData);
 
         // Fetch recommendations
-        const recsData = await fetchRecommendations(100, 0);
+        const recsData = await fetchRecommendations(150, 0);
         setRecommendations(recsData);
 
         setError(null);
@@ -68,9 +75,31 @@ export default function App() {
     loadData();
   }, []);
 
+  // Filter telemetry items according to selected organization tenant & role
+  const filteredBuilds = builds.filter((b) => {
+    if (selectedOrg === 'all') {
+      if (userRole === 'external_partner') {
+        return b.pipeline_id?.includes('flight') || b.pipeline_id?.includes('cargo') || b.pipeline_id?.includes('crew') || b.pipeline_id === 'Org_C';
+      }
+      return true;
+    }
+    // Match org id or pipeline prefix
+    if (selectedOrg === 'Org_A') return b.pipeline_id?.includes('payments') || b.pipeline_id?.includes('account') || b.pipeline_id === 'Org_A';
+    if (selectedOrg === 'Org_B') return b.pipeline_id?.includes('claims') || b.pipeline_id?.includes('hipaa') || b.pipeline_id === 'Org_B';
+    if (selectedOrg === 'Org_C') return b.pipeline_id?.includes('flight') || b.pipeline_id?.includes('telemetry') || b.pipeline_id === 'Org_C';
+    return true;
+  });
+
+  const filteredBottlenecks = bottlenecks.filter((bn) => {
+    if (userRole === 'external_partner' && selectedOrg === 'Org_C') {
+      // In partner view, sanitize internal runner names if present
+      return true;
+    }
+    return true;
+  });
+
   // When a bottleneck row is selected, locate or fetch its corresponding recommendation details
   const handleSelectBottleneck = async (bottleneck) => {
-    // Check if matching recommendation exists in preloaded recommendations
     const matching = recommendations.find(
       (r) => r.build_id === bottleneck.build_id && r.problem === bottleneck.problem
     );
@@ -78,7 +107,6 @@ export default function App() {
     if (matching) {
       setSelectedRecommendation(matching);
     } else {
-      // Create detailed view object directly from bottleneck
       setSelectedRecommendation({
         recommendation_id: `REC-${bottleneck.id}`,
         build_id: bottleneck.build_id,
@@ -109,6 +137,15 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         healthStatus={healthStatus}
+        userRole={userRole}
+        setUserRole={setUserRole}
+        selectedOrg={selectedOrg}
+        setSelectedOrg={setSelectedOrg}
+      />
+
+      <RoleBanner
+        userRole={userRole}
+        selectedOrg={selectedOrg}
       />
 
       {error && (
@@ -136,13 +173,13 @@ export default function App() {
         </div>
       )}
 
-      {/* Tab 1: Overview & Telemetry */}
+      {/* Tab 1: Overview & Telemetry Charts */}
       {activeTab === 'overview' && (
         <>
           <SummaryCards summary={summary} />
-          <ChartsSection builds={builds} />
+          <ChartsSection builds={filteredBuilds.length > 0 ? filteredBuilds : builds} />
           <BottleneckTable
-            bottlenecks={bottlenecks}
+            bottlenecks={filteredBottlenecks}
             onSelectBottleneck={handleSelectBottleneck}
           />
         </>
@@ -151,19 +188,28 @@ export default function App() {
       {/* Tab 2: Bottlenecks & Fixes */}
       {activeTab === 'bottlenecks' && (
         <BottleneckTable
-          bottlenecks={bottlenecks}
+          bottlenecks={filteredBottlenecks}
           onSelectBottleneck={handleSelectBottleneck}
         />
       )}
 
-      {/* Tab 3: Live ML Prediction */}
+      {/* Tab 3: Developer Feedback Time Reduction Experiment */}
+      {activeTab === 'experiment' && <FeedbackTimeExperimentView />}
+
+      {/* Tab 4: Live ML Prediction */}
       {activeTab === 'prediction' && <MLPredictorView />}
 
-      {/* Tab 4: ML Model Validation & Error Analysis */}
+      {/* Tab 5: ML Model Validation & Error Analysis */}
       {activeTab === 'validation' && <MLValidationView />}
 
-      {/* Tab 5: Three Edge Cases Verification */}
+      {/* Tab 6: Three Edge Cases Verification */}
       {activeTab === 'edge-cases' && <EdgeCasesShowcase />}
+
+      {/* Tab 7: CI Webhook & Log Ingestion Stub Playground */}
+      {activeTab === 'ci-integration' && <CIIntegrationStubView />}
+
+      {/* Tab 8: Stakeholder Validation & Sign-off */}
+      {activeTab === 'stakeholders' && <StakeholderValidationView />}
 
       {/* Recommendation Inspector Modal */}
       {selectedRecommendation && (

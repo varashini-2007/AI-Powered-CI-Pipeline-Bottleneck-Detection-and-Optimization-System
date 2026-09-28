@@ -24,18 +24,26 @@ from backend.models import (
 from backend.database import (
     init_db, get_organisations, get_builds, get_build_by_id
 )
+from backend.app.api.routes import router as api_router
+from backend.app.config import MODEL_FILE_PATH, METRICS_FILE_PATH
 
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    if not MODEL_FILE_PATH.exists() or not METRICS_FILE_PATH.exists():
+        try:
+            from backend.app.ml.train import train_and_evaluate
+            train_and_evaluate()
+        except Exception as exc:
+            print(f"[Startup Warning] Could not train ML model on startup: {exc}")
     yield
 
 app = FastAPI(
     title="CI Insight: Intelligent CI Bottleneck Analyser",
-    description="Initial foundation and telemetry API for regulated enterprise CI pipelines.",
-    version="1.0.0-foundation",
+    description="Full-stack telemetry API, bottleneck detection, ML prediction, and explainable recommendations for regulated enterprise CI pipelines.",
+    version="1.0.0",
     lifespan=lifespan
 )
 
@@ -47,6 +55,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include comprehensive API router
+app.include_router(api_router, prefix="/api")
 
 
 @app.get("/health")

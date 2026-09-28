@@ -78,3 +78,60 @@ export async function fetchMLMetrics() {
   if (!res.ok) throw new Error('Failed to fetch ML metrics');
   return res.json();
 }
+
+export async function fetchOrganisations(role = '', org = '') {
+  const headers = {};
+  if (role) headers['X-User-Role'] = role;
+  if (org && org !== 'all') headers['X-User-Org'] = org;
+  const res = await fetch(`${API_BASE}/organisations`, { headers });
+  if (!res.ok) throw new Error('Failed to fetch organisations');
+  return res.json();
+}
+
+export async function fetchExperimentMetrics() {
+  const res = await fetch(`${API_BASE}/experiment/metrics`);
+  if (!res.ok) throw new Error('Failed to fetch experiment metrics');
+  return res.json();
+}
+
+export async function sendCIWebhook(payload) {
+  const res = await fetch(`${API_BASE}/ci/webhook`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'CI webhook ingestion failed');
+  }
+  return res.json();
+}
+
+export async function fetchStakeholderValidation() {
+  const res = await fetch(`${API_BASE}/stakeholders/validation`);
+  if (!res.ok) throw new Error('Failed to fetch stakeholder validation data');
+  return res.json();
+}
+
+export async function fetchRolesContext() {
+  const res = await fetch(`${API_BASE}/roles/context`);
+  if (!res.ok) throw new Error('Failed to fetch roles context');
+  return res.json();
+}
+
+export async function fetchThresholds() {
+  const res = await fetch(`${API_BASE}/thresholds`);
+  if (!res.ok) throw new Error('Failed to fetch thresholds');
+  return res.json();
+}
+
+export async function updateThresholds(params) {
+  const url = new URL(`${API_BASE}/thresholds`, window.location.origin);
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null) url.searchParams.append(k, v);
+  });
+  const res = await fetch(url.toString(), { method: 'POST' });
+  if (!res.ok) throw new Error('Failed to update thresholds');
+  return res.json();
+}
+

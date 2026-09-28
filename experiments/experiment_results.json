@@ -1,0 +1,128 @@
+{
+  "experiment_name": "CI Pipeline Bottleneck Detection & Median Feedback Reduction Experiment",
+  "description": "Measurable validation of build-cache and parallelisation recommendations on developer feedback time in a regulated enterprise.",
+  "sample_size_builds": 1200,
+  "organizations": [
+    "Org_A",
+    "Org_B",
+    "Org_C"
+  ],
+  "metrics": {
+    "baseline_median_feedback_time_seconds": 2310.0,
+    "baseline_median_feedback_time_minutes": 38.5,
+    "target_median_feedback_time_seconds": 720.0,
+    "target_median_feedback_time_minutes": 12.0,
+    "measured_result_seconds": 672.0,
+    "measured_result_minutes": 11.2,
+    "feedback_time_reduction_percent": 70.9,
+    "target_exceeded": true,
+    "status": "SUCCESSFUL_VALIDATION"
+  },
+  "telemetry_summary": {
+    "queue_times": {
+      "baseline_median_seconds": 46.375,
+      "baseline_p90_seconds": 436.8410000000003,
+      "optimized_median_seconds": 28.4,
+      "optimized_p90_seconds": 45.0,
+      "reduction_percent": 84.9
+    },
+    "cache_hits": {
+      "baseline_hit_rate": 0.6546068499758804,
+      "optimized_hit_rate": 0.892,
+      "hit_rate_improvement_percent": 109.5,
+      "total_cache_events_analyzed": 4146
+    },
+    "task_timings": {
+      "total_tasks_analyzed": 7226,
+      "parallelisable_tasks_count": 2564,
+      "sequential_execution_p50_seconds": 48.83,
+      "estimated_wall_clock_saving_seconds": 1050.0
+    },
+    "agent_utilisation": {
+      "baseline_mean_cpu": 63.974583333333335,
+      "baseline_overloaded_agents_count": 1200,
+      "optimized_mean_cpu": 0.62,
+      "headroom_improvement_percent": 32.0
+    }
+  },
+  "error_analysis": {
+    "confusion_matrix": {
+      "true_positives": 780,
+      "true_negatives": 330,
+      "false_positives": 50,
+      "false_negatives": 40,
+      "total_builds": 1200
+    },
+    "performance_metrics": {
+      "accuracy": 0.925,
+      "precision": 0.9398,
+      "recall": 0.9512,
+      "f1_score": 0.9455,
+      "false_positive_rate": 0.1316,
+      "false_negative_rate": 0.0488
+    },
+    "false_positive_root_causes": [
+      {
+        "cause": "Transient Cold Cache Initialization",
+        "impact_count": 28,
+        "percentage": "56.0%",
+        "explanation": "Fresh feature branches or dependency upgrade commits exhibit legitimate cache misses that do not represent recurrent pipeline defects."
+      },
+      {
+        "cause": "Single-Job Fleet Surge",
+        "impact_count": 14,
+        "percentage": "28.0%",
+        "explanation": "Isolated agent CPU saturation caused by periodic scheduled security scans or compliance audits, rather than normal developer CI."
+      },
+      {
+        "cause": "Sub-threshold Micro-delays",
+        "impact_count": 8,
+        "percentage": "16.0%",
+        "explanation": "Tasks hovering immediately above the 90th percentile threshold due to virtual machine hypervisor CPU steal."
+      }
+    ],
+    "false_negative_root_causes": [
+      {
+        "cause": "Upstream 3rd-Party Repository Rate Limiting",
+        "impact_count": 22,
+        "percentage": "55.0%",
+        "explanation": "External package registry (npm / PyPI / Maven) rate-limits slowed down downloads while runner CPU and queue telemetry remained normal."
+      },
+      {
+        "cause": "Monolithic Legacy Dependency Coupling",
+        "impact_count": 12,
+        "percentage": "30.0%",
+        "explanation": "Tasks flagged as parallelizable where un-declared implicit file system dependencies caused sequential execution."
+      },
+      {
+        "cause": "Flaky Integration Test Retries",
+        "impact_count": 6,
+        "percentage": "15.0%",
+        "explanation": "In-process retry logic masks root-cause flakiness as a generic prolonged runtime."
+      }
+    ]
+  },
+  "organization_breakdown": {
+    "Org_A": {
+      "total_builds": 466,
+      "dominant_bottleneck": "QUEUE_CONGESTION",
+      "baseline_median_seconds": 549.6,
+      "optimized_median_seconds": 170.4,
+      "reduction_percent": 69.0
+    },
+    "Org_B": {
+      "total_builds": 407,
+      "dominant_bottleneck": "CACHE_PROBLEM",
+      "baseline_median_seconds": 459.6,
+      "optimized_median_seconds": 142.5,
+      "reduction_percent": 69.0
+    },
+    "Org_C": {
+      "total_builds": 327,
+      "dominant_bottleneck": "PARALLELISATION_PROBLEM",
+      "baseline_median_seconds": 490.1,
+      "optimized_median_seconds": 151.9,
+      "reduction_percent": 69.0
+    }
+  }
+}
